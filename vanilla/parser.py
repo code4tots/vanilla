@@ -202,3 +202,28 @@ class Parser(object):
         self.consume(',')
     return 'args', token, args, vararg
 
+
+class Visitor(object):
+
+  def visit(self, node):
+    if isinstance(node, tuple):
+      if hasattr(node, 'visit_' + node[0]):
+        return getattr(node, 'visit_' + node[0])(node)
+      else:
+        return self.generic_visit(node)
+    elif isinstance(node, (str, int, float)):
+      return node
+    elif isinstance(node, list):
+      for child in node:
+        self.vsiit(child)
+      return node
+    else:
+      raise ValueError(node)
+
+  def generic_visit(self, node):
+    for child in node[1:]:
+      self.visit(child)
+    return node
+
+
+
